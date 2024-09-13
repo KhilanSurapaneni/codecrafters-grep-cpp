@@ -1,39 +1,14 @@
+// main.cpp
 #include <iostream>
 #include <string>
-#include <algorithm>
-
-
-bool match_character(const std::string& input_line, const std::string& pattern){
-    return input_line.find(pattern) != std::string::npos;
-}
-
-bool match_digit(const std::string& input_line) {
-    for (char c : input_line) {
-        if (std::isdigit(c)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool match_pattern(const std::string& input_line, const std::string& pattern) {
-    if (pattern.length() == 1) {
-        return match_character(input_line, pattern);
-    }
-    else if (pattern == "\\d") {
-        return match_digit(input_line);
-    }
-    else {
-        throw std::runtime_error("Unhandled pattern " + pattern);
-    }
-}
+#include "grep_funcs.h"
 
 int main(int argc, char* argv[]) {
     // Flush after every std::cout / std::cerr
     std::cout << std::unitbuf;
     std::cerr << std::unitbuf;
 
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
+    // You can use print statements as follows for debugging
     std::cout << "Logs from your program will appear here" << std::endl;
 
     if (argc != 3) {
@@ -49,11 +24,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Uncomment this block to pass the first stage
-    
     std::string input_line;
     std::getline(std::cin, input_line);
-    
+
     try {
         if (match_pattern(input_line, pattern)) {
             return 0;
