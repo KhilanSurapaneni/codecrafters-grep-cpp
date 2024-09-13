@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "grep_funcs.hpp"
+#include "src/grep_funcs.hpp"
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
