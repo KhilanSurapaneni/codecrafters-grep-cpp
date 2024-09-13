@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "grep_funcs.hpp"
+#include <algorithm>
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
@@ -12,6 +12,19 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     else {
         throw std::runtime_error("Unhandled pattern " + pattern);
     }
+}
+
+bool match_character(const std::string& input_line, const std::string& pattern){
+    return input_line.find(pattern) != std::string::npos;
+}
+
+bool match_digit(const std::string& input_line) {
+    for (char c : input_line) {
+        if (std::isdigit(c)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int main(int argc, char* argv[]) {
