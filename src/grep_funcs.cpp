@@ -38,6 +38,7 @@ bool match_pos_char_groups(const std::string& input_line, const std::string& pat
     return false;
 }
 
+
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
         return match_character(input_line, pattern);
@@ -47,6 +48,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     } 
     else if (pattern == "\\w") {
         return match_alnum(input_line);
+    }
+    else if (pattern.front() == '[' && pattern.back() == ']' && pattern.length() > 2 && pattern[1] == '^') {
+        return !match_pos_char_groups(input_line, '[' + pattern.substr(1, pattern.length()));
     }
     else if (pattern.front() == '[' && pattern.back() == ']') {
         return match_pos_char_groups(input_line, pattern);
