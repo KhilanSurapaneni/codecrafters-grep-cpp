@@ -18,12 +18,21 @@ bool match_digit(const std::string& input_line) {
     return false;
 }
 
+bool match_alnum(const std::string& input_line) {
+    return std::any_of(input_line.begin(), input_line.end(), ::isalnum);
+}
+
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
         return match_character(input_line, pattern);
-    } else if (pattern == "\\d") {
+    } 
+    else if (pattern == "\\d") {
         return match_digit(input_line);
-    } else {
+    } 
+    else if (pattern == "\\w") {
+        return match_alnum(input_line);
+    }
+    else {
         throw std::runtime_error("Unhandled pattern " + pattern);
     }
 }
