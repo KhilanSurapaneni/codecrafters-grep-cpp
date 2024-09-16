@@ -145,6 +145,12 @@ bool match_combined_char_classes(const std::string& input_line, const std::strin
     return false; // No match found
 }
 
+bool match_start_of_string(const std::string& input_line, const std::string& pattern) {
+    const std::string pattern_prefix = pattern.substr(1);
+    return match_combined_char_classes_helper(input_line, pattern_prefix);
+}
+
+
 // Main function to match the input_line against the pattern
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
@@ -172,6 +178,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
             // Positive character class
             return match_pos_char_groups(input_line, pattern);
         }
+    }
+    else if (pattern.front() == '^'){
+        return match_start_of_string(input_line, pattern);
     }
     else {
         // For other patterns, use the match function
