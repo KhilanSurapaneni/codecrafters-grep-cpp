@@ -146,8 +146,17 @@ bool match_combined_char_classes(const std::string& input_line, const std::strin
 }
 
 bool match_start_of_string(const std::string& input_line, const std::string& pattern) {
-    const std::string pattern_prefix = pattern.substr(1);
-    return match_combined_char_classes_helper(input_line, pattern_prefix);
+    const std::string pattern_suffix = pattern.substr(1);
+    return match_combined_char_classes_helper(input_line, pattern_suffix);
+}
+
+bool match_end_of_string(const std::string& input_line, const std::string& pattern) {
+    const std::string pattern_suffix = pattern.substr(0, pattern.length() - 1);
+    if (pattern_suffix.length() > input_line.length()) {
+        return false; // Pattern is longer than the input line
+    }
+    const std::string input = input_line.substr(input_line.length() - pattern_suffix.length());
+    return match_combined_char_classes_helper(input, pattern_suffix);
 }
 
 
@@ -181,6 +190,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     }
     else if (pattern.front() == '^'){
         return match_start_of_string(input_line, pattern);
+    }
+    else if (pattern.back() == '$'){
+        return match_end_of_string(input_line, pattern);
     }
     else {
         // For other patterns, use the match function
