@@ -16,6 +16,7 @@ bool match_end_of_string(const std::string& input_line, const std::string& patte
 bool match_one_or_more(const std::string& input_line, const std::string& pattern);
 bool match_zero_or_one(const std::string& input_line, const std::string& pattern);
 bool match_wildcard(const std::string& input_line, const std::string& pattern);
+bool match_alternation(const std::string& input_line, const std::string& pattern);
 
 // Helper functions
 bool match_combined_char_classes_helper(const std::string& input_line, const std::string& pattern);
@@ -25,5 +26,6 @@ bool match_wildcard_helper(const std::string& input_line, const std::string& pre
 bool contains_question_mark(const std::string& pattern);
 bool contains_plus(const std::string& pattern);
 bool contains_period(const std::string& pattern);
+bool contains_pipe(const std::string& pattern);
 
 #endif // GREP_FUNCS_H

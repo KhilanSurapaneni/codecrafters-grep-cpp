@@ -159,7 +159,6 @@ bool match_end_of_string(const std::string& input_line, const std::string& patte
     return match_combined_char_classes_helper(input, pattern_suffix);
 }
 
-
 bool match_one_or_more_helper(const std::string& input_line, const std::string& prefix_pattern, char repeated_char, const std::string& suffix_pattern) {
     int prefix_idx = 0;
     int input_idx = 0;
@@ -357,6 +356,48 @@ bool contains_period(const std::string& pattern) {
     return pattern.find('.') != std::string::npos;
 }
 
+bool match_alternation(const std::string& input_line, const std::string& pattern) {
+    size_t open_paren = pattern.find('(');
+    size_t close_paren = pattern.find(')', open_paren);
+
+    if (open_paren == std::string::npos || close_paren == std::string::npos) {
+        // No parentheses found; cannot process alternation
+        return false;
+    }
+
+    // Extract the prefix, alternation part, and suffix
+    std::string prefix = pattern.substr(0, open_paren);
+    std::string alternation = pattern.substr(open_paren + 1, close_paren - open_paren - 1);
+    std::string suffix = pattern.substr(close_paren + 1);
+
+    // Split the alternation part into options
+    std::vector<std::string> options;
+    size_t start = 0;
+    size_t end = 0;
+
+    while ((end = alternation.find('|', start)) != std::string::npos) {
+        options.push_back(alternation.substr(start, end - start));
+        start = end + 1;
+    }
+
+    options.push_back(alternation.substr(start));
+
+    // Construct full patterns and attempt to match
+    for (const std::string& option : options) {
+        std::string full_pattern = prefix + option + suffix;
+        if (match_combined_char_classes(input_line, full_pattern)) {
+            return true;  // Match found
+        }
+    }
+
+    return false;  // No match found
+}
+
+bool contains_pipe(const std::string& pattern) {
+    return pattern.find('|') != std::string::npos;
+}
+
+
 // Main function to match the input_line against the pattern
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
@@ -398,6 +439,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     }
     else if (contains_period(pattern)) {
         return match_wildcard(input_line, pattern);
+    }
+    else if (contains_pipe(pattern)) {
+        return match_alternation(input_line, pattern);
     }
     else {
         // For other patterns, use the match function
