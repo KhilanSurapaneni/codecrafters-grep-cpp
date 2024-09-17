@@ -14,5 +14,13 @@ bool match_combined_char_classes(const std::string& input_line, const std::strin
 bool match_start_of_string(const std::string& input_line, const std::string& pattern);
 bool match_end_of_string(const std::string& input_line, const std::string& pattern);
 bool match_one_or_more(const std::string& input_line, const std::string& pattern);
+bool match_zero_or_one(const std::string& input_line, const std::string& pattern);
+
+// Helper functions
+bool match_combined_char_classes_helper(const std::string& input_line, const std::string& pattern);
+bool match_one_or_more_helper(const std::string& input_line, const std::string& prefix_pattern, char letter, const std::string& suffix_pattern);
+bool match_zero_or_one_helper(const std::string& input_line, const std::string& prefix_pattern, char letter, const std::string& suffix_pattern);
+bool contains_question_mark(const std::string& pattern);
+bool contains_plus(const std::string& pattern);
 
 #endif // GREP_FUNCS_H
