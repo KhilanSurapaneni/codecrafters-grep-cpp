@@ -160,14 +160,89 @@ bool match_end_of_string(const std::string& input_line, const std::string& patte
 }
 
 
+bool match_one_or_more_helper(const std::string& input_line, const std::string& prefix_pattern, char repeated_char, const std::string& suffix_pattern) {
+    int prefix_idx = 0;
+    int input_idx = 0;
+
+    // Matching the Prefix Pattern Exactly
+    while (prefix_idx < prefix_pattern.length() && input_idx < input_line.length()) {
+        if (input_line[input_idx] == prefix_pattern[prefix_idx]) {
+            prefix_idx++;
+            input_idx++;
+        } else {
+            return false;  // Prefix does not match
+        }
+    }
+
+    // Matching One or More Occurrences of the Repeated Character
+    int repeat_count = 0;  // Counter to ensure at least one occurrence
+    while (input_idx < input_line.length() && repeated_char == input_line[input_idx]) {
+        input_idx++;
+        repeat_count++;
+    }
+    if (repeat_count == 0) {
+        return false;  // No occurrence of the character before '+'
+    }
+
+    // Matching the Suffix Pattern Exactly
+    int suffix_idx = 0;
+    while (suffix_idx < suffix_pattern.length() && input_idx < input_line.length()) {
+        if (input_line[input_idx] == suffix_pattern[suffix_idx]) {
+            suffix_idx++;
+            input_idx++;
+        } else {
+            return false;  // Suffix does not match
+        }
+    }
+
+    // Ensure Complete Match of Prefix and Suffix Patterns
+    return suffix_idx == suffix_pattern.length() && prefix_idx == prefix_pattern.length();
+}
+
+bool match_one_or_more(const std::string& input_line, const std::string& pattern) {
+    std::string letter = "";
+    size_t prefix_idx = 0;
+    size_t suffix_idx = 0;
+
+    // Parsing the pattern to find the character before '+'
+    for (size_t i = 0; i < pattern.length(); i++) {
+        if (pattern[i] == '+' && i > 0) {
+            letter = pattern.substr(i - 1, 1);  // Character before '+'
+            prefix_idx = i - 1;                 // **Adjust index to exclude the character before '+'
+            suffix_idx = i + 1;                 // Index after '+'
+            break; // Break after finding the first '+'
+        }
+    }
+
+    // Extracting the prefix and suffix patterns
+    const std::string prefix_pattern = pattern.substr(0, prefix_idx);
+    const std::string suffix_pattern = pattern.substr(suffix_idx);
+
+    // Attempting to match the pattern within the input_line
+    const char first_letter_of_prefix = prefix_pattern.empty() ? letter[0] : prefix_pattern[0];
+    for (size_t i = 0; i < input_line.length(); i++) {
+        char c = input_line[i];
+        if (c == first_letter_of_prefix) {
+            const std::string inp = input_line.substr(i);
+            if (match_one_or_more_helper(inp, prefix_pattern, letter[0], suffix_pattern)) {
+                return true;  // Match found
+            }
+        }
+    }
+    return false;  // No match found
+}
+
+bool contains_plus(const std::string& pattern) {
+    return pattern.find('+') != std::string::npos;
+}
+
 // Main function to match the input_line against the pattern
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
         // Single character pattern
         return match_character(input_line, pattern);
     }
-
-    if (pattern.length() == 2 && pattern[0] == '\\') {
+    else if (pattern.length() == 2 && pattern[0] == '\\') {
         // Handle single-character escape sequences
         if (pattern == "\\d") {
             return match_digit(input_line); // Match any digit
@@ -193,6 +268,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     }
     else if (pattern.back() == '$'){
         return match_end_of_string(input_line, pattern);
+    }
+    else if (contains_plus(pattern)) {
+        return match_one_or_more(input_line, pattern);
     }
     else {
         // For other patterns, use the match function
