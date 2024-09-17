@@ -312,6 +312,51 @@ bool contains_question_mark(const std::string& pattern) {
     return pattern.find('?') != std::string::npos;
 }
 
+bool match_wildcard_helper(const std::string& input_line, const std::string& pattern) {
+    size_t pattern_idx = 0;
+    size_t input_idx = 0;
+
+    while (pattern_idx < pattern.length() && input_idx < input_line.length()) {
+        if (pattern[pattern_idx] == '.') {
+            // Wildcard matches any character
+            pattern_idx++;
+            input_idx++;
+        } else {
+            // Match literal character
+            if (pattern[pattern_idx] == input_line[input_idx]) {
+                pattern_idx++;
+                input_idx++;
+            } else {
+                return false;  // Characters do not match
+            }
+        }
+    }
+
+    // Ensure the entire pattern has been matched
+    return pattern_idx == pattern.length();
+}
+
+bool match_wildcard(const std::string& input_line, const std::string& pattern) {
+    size_t input_length = input_line.length();
+    size_t pattern_length = pattern.length();
+
+    if (pattern_length == 0) {
+        return true;  // Empty pattern matches any input
+    }
+
+    // Iterate over possible starting positions
+    for (size_t i = 0; i <= input_length - pattern_length; i++) {
+        if (match_wildcard_helper(input_line.substr(i, pattern_length), pattern)) {
+            return true;  // Match found
+        }
+    }
+    return false;  // No match found
+}
+
+bool contains_period(const std::string& pattern) {
+    return pattern.find('.') != std::string::npos;
+}
+
 // Main function to match the input_line against the pattern
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
@@ -350,6 +395,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     }
     else if (contains_question_mark(pattern)) {
         return match_zero_or_one(input_line, pattern);
+    }
+    else if (contains_period(pattern)) {
+        return match_wildcard(input_line, pattern);
     }
     else {
         // For other patterns, use the match function
